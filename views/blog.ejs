@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head') %>
+    <title><%= blog.title %> | Blogify Journal</title>
+  </head>
+  <body>
+    <%- include('./partials/nav') %>
+
+    <article class="container py-5">
+      <div class="article-shell mx-auto">
+        <img src="<%= blog.coverImageURL %>" class="article-cover mb-4" alt="<%= blog.title %>" />
+        <p class="section-label mb-2">Feature story</p>
+        <h1 class="article-title"><%= blog.title %></h1>
+        <div class="article-author mt-4">
+          <img src="<%= blog.createdBy.profileImageURL %>" class="author-avatar" alt="<%= blog.createdBy.fullName %>" />
+          <div>
+            <p class="mb-0 fw-semibold"><%= blog.createdBy.fullName %></p>
+            <p class="text-muted mb-0">Published by the Blogify Journal community</p>
+          </div>
+        </div>
+        <div class="article-body mt-4">
+          <pre><%= blog.body %></pre>
+        </div>
+      </div>
+    </article>
+
+    <div class="container pb-5">
+      <div class="comment-shell mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="section-title mb-0">Discussion</h2>
+          <span class="text-muted"><%= comments.length %> comments</span>
+        </div>
+
+        <% if (locals.user) { %>
+        <form action="/blog/comment/<%= blog._id %>" method="post" class="mb-4">
+          <div class="mb-3">
+            <label for="content" class="form-label">Add a comment</label>
+            <input
+              id="content"
+              type="text"
+              name="content"
+              class="form-control"
+              placeholder="What stood out to you?"
+            />
+          </div>
+          <button class="btn btn-accent btn-sm" type="submit">Post comment</button>
+        </form>
+        <% } else { %>
+        <div class="empty-state text-start mb-4">
+          <h3>Join the conversation</h3>
+          <p class="mb-0">
+            <a href="/user/signin">Sign in</a> to respond to this post.
+          </p>
+        </div>
+        <% } %>
+
+        <div class="d-grid gap-3">
+          <% comments.forEach(comment => { %>
+          <div class="comment-card">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <img src="<%= comment.createdBy.profileImageURL %>" class="author-avatar" alt="<%= comment.createdBy.fullName %>" />
+              <span class="fw-semibold"><%= comment.createdBy.fullName %></span>
+            </div>
+            <pre class="comment-copy"><%= comment.content %></pre>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+
+    <%- include('./partials/scripts') %>
+  </body>
+</html>

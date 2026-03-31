@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head') %>
+    <title>Blogify Journal</title>
+  </head>
+  <body>
+    <%- include('./partials/nav') %>
+
+    <section class="hero-shell">
+      <div class="container py-5">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <span class="hero-kicker">Community publishing space</span>
+            <h1 class="hero-title mt-3">Stories, notes, and ideas that feel human.</h1>
+            <p class="hero-copy mt-3">
+              Blogify Journal is a shared writing corner for project updates,
+              experiments, personal essays, and practical insights.
+            </p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+              <% if (locals.user) { %>
+              <a href="/blog/compose" class="btn btn-accent">Write a post</a>
+              <% } else { %>
+              <a href="/user/signup" class="btn btn-accent">Start writing</a>
+              <% } %>
+              <a href="#latest-posts" class="btn btn-outline-dark">Browse posts</a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="hero-panel">
+              <p class="hero-panel-label">What belongs here</p>
+              <ul class="hero-panel-list">
+                <li>Build logs and launch notes</li>
+                <li>Case studies and technical writeups</li>
+                <li>Team updates and reflective essays</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container pb-5" id="latest-posts">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <p class="section-label mb-1">Latest posts</p>
+          <h2 class="section-title mb-0">Fresh writing from the community</h2>
+        </div>
+      </div>
+
+      <% if (!blogs.length) { %>
+      <div class="empty-state">
+        <h3>No posts yet</h3>
+        <p>
+          The feed is ready. Publish the first story and set the tone for the
+          space.
+        </p>
+      </div>
+      <% } else { %>
+      <div class="row g-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
+        <% blogs.forEach(blog => { %>
+        <div class="col">
+          <article class="story-card h-100">
+            <img src="<%= blog.coverImageURL %>" class="story-card-image" alt="<%= blog.title %>" />
+            <div class="story-card-body">
+              <p class="story-card-meta">
+                <%= blog.createdBy?.fullName || "Guest writer" %>
+              </p>
+              <h3 class="story-card-title"><%= blog.title %></h3>
+              <a href="/blog/<%= blog._id %>" class="btn btn-sm btn-outline-dark">Read post</a>
+            </div>
+          </article>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+
+    <%- include('./partials/scripts') %>
+  </body>
+</html>
