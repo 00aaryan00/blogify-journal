@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const User = require("../models/user");
+const { asyncHandler } = require("../middlewares/asyncHandler");
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.get("/signup", (req, res) => {
   });
 });
 
-router.post("/signin", async (req, res) => {
+router.post("/signin", asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   try {
     const token = await User.matchPasswordAndGenerateToken(email, password);
@@ -32,13 +33,13 @@ router.post("/signin", async (req, res) => {
       error: "Incorrect Email or Password",
     });
   }
-});
+}));
 
 router.get("/logout", (req, res) => {
   res.clearCookie("token").redirect("/");
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
   if (!fullName || !email || !password) {
     return res.status(400).render("signup", {
@@ -54,6 +55,6 @@ router.post("/signup", async (req, res) => {
   });
 
   return res.redirect("/user/signin");
-});
+}));
 
 module.exports = router;

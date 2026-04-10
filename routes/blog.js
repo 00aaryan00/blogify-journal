@@ -4,6 +4,7 @@ const multer = require("multer");
 const Blog = require("../models/blog");
 const Comment = require("../models/comment");
 const { requireAuthentication } = require("../middlewares/authentication");
+const { asyncHandler } = require("../middlewares/asyncHandler");
 const {
   getMissingImageKitVars,
   uploadBlogCover,
@@ -39,8 +40,16 @@ router.get("/compose", requireAuthentication, (req, res) => {
   });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", asyncHandler(async (req, res) => {
   const blog = await Blog.findById(req.params.id).populate("createdBy");
+  if (!blog) {
+    return res.status(404).render("home", {
+      user: req.user,
+      blogs: [],
+      error: "Blog post not found.",
+    });
+  }
+
   const comments = await Comment.find({ blogId: req.params.id }).populate(
     "createdBy"
   );
@@ -50,9 +59,9 @@ router.get("/:id", async (req, res) => {
     blog,
     comments,
   });
-});
+}));
 
-router.post("/comment/:blogId", requireAuthentication, async (req, res) => {
+router.post("/comment/:blogId", requireAuthentication, asyncHandler(async (req, res) => {
   if (!req.body.content?.trim()) {
     return res.redirect(`/blog/${req.params.blogId}`);
   }
@@ -63,13 +72,13 @@ router.post("/comment/:blogId", requireAuthentication, async (req, res) => {
     createdBy: req.user._id,
   });
   return res.redirect(`/blog/${req.params.blogId}`);
-});
+}));
 
 router.post(
   "/",
   requireAuthentication,
   upload.single("coverImage"),
-  async (req, res) => {
+  asyncHandler(async (req, res) => {
   const { title, body } = req.body;
   if (!title?.trim() || !body?.trim() || !req.file) {
     return res.status(400).render("addBlog", {
@@ -102,7 +111,7 @@ router.post(
     coverImageURL,
   });
   return res.redirect(`/blog/${blog._id}`);
-  }
+  })
 );
 
 module.exports = router;
